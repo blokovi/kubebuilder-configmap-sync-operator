@@ -18,6 +18,7 @@ package controller
 
 import (
 	"context"
+	"fmt"
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -50,13 +51,17 @@ type ConfigMapSyncReconciler struct {
 //
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.20.4/pkg/reconcile
+
+// Reconcile se pozove svaki put kada se kreira/promeni/obrise bilo koj CR koji je tipa configMapSync
 func (r *ConfigMapSyncReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := logf.FromContext(ctx) //dal ovde da stavim log :=, bilo je _ = logf...., u primeru je log := r.Log.WithValues("configmapsync", req.NamespacedName)
 
 	// TODO(user): your logic here
 
 	configMapSync := &appsv1.ConfigMapSync{}
-	// log.Info("IVKE", "SOURCE Namespace", configMapSync.Spec.SourceNamespace)
+	log.Info("IVKE", "req.NamespacedName", req.NamespacedName)
+	fmt.Printf("%+v\n", req.NamespacedName)
+	// ovde se ucita CR tipa configMapSync koji je Kubernetes event loop prosledio kontroleru (neki koji je upravo kreiran/promenjen/obrisan)
 	if err := r.Get(ctx, req.NamespacedName, configMapSync); err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
